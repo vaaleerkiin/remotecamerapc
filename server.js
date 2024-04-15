@@ -65,19 +65,18 @@ function findFreePortPmfy(beg, ...rest) {
 }
 
 (async () => {
-  const [port] = await findFreePortPmfy(3000);
+  const [port] = await findFreePortPmfy(3033);
 
   const server = http.createServer((req, res) => {
     const parsedUrl = url.parse(req.url, true);
+    const headers = {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "OPTIONS, POST, GET",
+      "Access-Control-Max-Age": 2592000,
 
+      "Content-Type": "application/json",
+    };
     if (parsedUrl.pathname === "/api/connect-obs") {
-      const headers = {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "OPTIONS, POST, GET",
-        "Access-Control-Max-Age": 2592000,
-
-        "Content-Type": "application/json",
-      };
       //   res.setHeader("Content-Type", "application/json");
 
       if (req.method === "OPTIONS") {
