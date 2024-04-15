@@ -19,12 +19,12 @@ export default function Home() {
   useEffect(() => {
     if (init) {
       setInit(false);
-      fetchData(150);
+      fetchData(999);
     }
   }, [init]);
 
   const fetchData = async (num: number) => {
-    for (let i = 140; i < num; i += 1) {
+    for (let i = 0; i < num; i += 1) {
       fetch(`http://192.168.0.${i}:3033/api/connect-obs`)
         .then((res) => res.json())
         .then((data) => {
