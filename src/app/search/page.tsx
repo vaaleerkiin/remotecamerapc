@@ -19,22 +19,19 @@ export default function Home() {
   useEffect(() => {
     if (init) {
       setInit(false);
-      fetchData(5);
+      fetchData(150);
     }
   }, [init]);
 
   const fetchData = async (num: number) => {
-    for (let i = 0; i < num; i += 1) {
-      try {
-        const res = await fetch(
-          `http://localhost:3${i.toString().padStart(3, "0")}/api/connect-obs`
-        );
-        const data = await res.json();
-        setDevices((prevDevices) => [...prevDevices, data]);
-        setLoading(false);
-      } catch (error) {
-        console.log("fail");
-      }
+    for (let i = 140; i < num; i += 1) {
+      fetch(`http://192.168.0.${i}:3033/api/connect-obs`)
+        .then((res) => res.json())
+        .then((data) => {
+          setDevices((prevDevices) => [...prevDevices, data]);
+          setLoading(false);
+        })
+        .catch(() => console.log("fail"));
     }
   };
 
