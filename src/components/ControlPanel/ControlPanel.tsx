@@ -1,6 +1,6 @@
 "use client";
 
-import { Heading } from "@chakra-ui/react";
+import { Heading, Img } from "@chakra-ui/react";
 import { redirect, useSearchParams } from "next/navigation";
 import OBSWebSocket from "obs-websocket-js";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -8,10 +8,7 @@ import { Container } from "@chakra-ui/react";
 import { SceneChange } from "./SceneChange";
 import { ToogleStream } from "./ToogleStream";
 import { BackButton } from "../BackButton";
-
-// const obs = new OBSWebSocket();
-// obs.connect(`ws://192.168.0.143:4455`);
-// obs.connect(`ws://192.168.0.143:4455`);
+import { Viewer } from "./Viewer";
 
 export const ControlPanel = () => {
   const [loading, setLoading] = useState(true);
@@ -49,6 +46,11 @@ export const ControlPanel = () => {
     );
     setCurrnetScene(sceneList.currentProgramSceneName);
 
+    setSceneList(
+      sceneList.scenes.map((el) => el.sceneName).reverse() as string[]
+    );
+    setCurrnetScene(sceneList.currentProgramSceneName);
+
     return () => {
       obs.disconnect();
     };
@@ -61,7 +63,14 @@ export const ControlPanel = () => {
       {!loading && obs && (
         <>
           <Heading textAlign="center">Control panel</Heading>
-          <Container marginTop={4} display="flex" flexWrap="wrap" gap={2}>
+          <Container
+            marginTop={4}
+            display="flex"
+            flexWrap="wrap"
+            gap={2}
+            justifyContent="center"
+          >
+            <Viewer obs={obs} currnetScene={currnetScene} />
             <SceneChange
               obs={obs}
               sceneList={sceneList}

@@ -85,7 +85,7 @@ export default function Home() {
                   w="24px"
                   h="24px"
                   borderRadius="50%"
-                  border="1px solid black"
+                  border="1px solid #cd0000"
                   backgroundColor="red"
                   position="absolute"
                   top="50%"
