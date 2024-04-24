@@ -7,6 +7,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Container } from "@chakra-ui/react";
 import { SceneChange } from "./SceneChange";
 import { ToogleStream } from "./ToogleStream";
+import { BackButton } from "../BackButton";
 
 // const obs = new OBSWebSocket();
 // obs.connect(`ws://192.168.0.143:4455`);
@@ -29,10 +30,13 @@ export const ControlPanel = () => {
 
   const fetchData = async () => {
     if (!loading) return;
-    setLoading(false);
+
     const obs = new OBSWebSocket();
     setObs(obs);
-    await obs.connect(`ws:${ip}:4455`).catch(console.log);
+    await obs
+      .connect(`ws:${ip}:4455`)
+      .catch(console.log)
+      .then(() => setLoading(false));
 
     const streamStatus = await obs
       .call("GetStreamStatus")
@@ -52,18 +56,12 @@ export const ControlPanel = () => {
 
   return (
     <>
-      <button
-        onClick={() => {
-          obs?.call("GetStreamStatus").then(console.log);
-        }}
-      >
-        Click
-      </button>
+      <BackButton />
 
       {!loading && obs && (
         <>
           <Heading textAlign="center">Control panel</Heading>
-          <Container marginTop={4} display="flex" gap={2}>
+          <Container marginTop={4} display="flex" flexWrap="wrap" gap={2}>
             <SceneChange
               obs={obs}
               sceneList={sceneList}
