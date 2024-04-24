@@ -1,73 +1,11 @@
+const OBSWebSocket = require("obs-websocket-js").default;
 const http = require("http");
 const url = require("url");
 const os = require("os");
-const net = require("net");
-
-function findFreePort(beg, ...rest) {
-  const p = rest.slice(0, rest.length - 1),
-    cb = rest[rest.length - 1];
-  let [end, ip, cnt] = Array.from(p);
-  if (!ip && end && !/^\d+$/.test(end)) {
-    ip = end;
-    end = 65534;
-  } else {
-    if (end == null) {
-      end = 65534;
-    }
-  }
-  if (cnt == null) {
-    cnt = 1;
-  }
-
-  const retcb = cb;
-  const res = [];
-  const probe = function (ip, port, cb) {
-    const s = net.createConnection({ port: port, host: ip });
-    s.on("connect", function () {
-      s.end();
-      cb(null, port + 1);
-    });
-    s.on("error", (err) => {
-      cb(port);
-    });
-  };
-  var onprobe = function (port, nextPort) {
-    if (port) {
-      res.push(port);
-      if (res.length >= cnt) {
-        retcb(null, ...res);
-      } else {
-        setImmediate(() => probe(ip, port + 1, onprobe));
-      }
-    } else {
-      if (nextPort >= end) {
-        retcb(new Error("No available ports"));
-      } else {
-        setImmediate(() => probe(ip, nextPort, onprobe));
-      }
-    }
-  };
-  return probe(ip, beg, onprobe);
-}
-
-function findFreePortPmfy(beg, ...rest) {
-  const last = rest[rest.length - 1];
-  if (typeof last === "function") {
-    findFreePort(beg, ...rest);
-  } else {
-    return new Promise((resolve, reject) => {
-      findFreePort(beg, ...rest, (err, ...ports) => {
-        if (err) reject(err);
-        else resolve(ports);
-      });
-    });
-  }
-}
+const port = 3033;
 
 (async () => {
-  const [port] = await findFreePortPmfy(3033);
-
-  const server = http.createServer((req, res) => {
+  const server = http.createServer(async (req, res) => {
     const parsedUrl = url.parse(req.url, true);
     const headers = {
       "Access-Control-Allow-Origin": "*",
@@ -77,8 +15,6 @@ function findFreePortPmfy(beg, ...rest) {
       "Content-Type": "application/json",
     };
     if (parsedUrl.pathname === "/api/connect-obs") {
-      //   res.setHeader("Content-Type", "application/json");
-
       if (req.method === "OPTIONS") {
         res.writeHead(204, headers);
         res.end();
@@ -106,9 +42,17 @@ function findFreePortPmfy(beg, ...rest) {
           });
         });
 
+        const obs = new OBSWebSocket();
+        await obs.connect(`ws://${localIp}:4455`);
+        const isRecording = await obs
+          .call("GetStreamStatus")
+          .then((res) => res.outputActive);
+        await obs.disconnect();
+
         const responseData = {
           ip: localIp,
           mac: macAddress,
+          isRecording,
         };
 
         res.end(JSON.stringify(responseData));
