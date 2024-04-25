@@ -9,7 +9,7 @@ export const Viewer = ({
 }: {
   obs: OBSWebSocket;
   currnetScene: string;
-  streamStatus: boolean;
+  streamStatus: boolean | undefined;
 }) => {
   const [sourceImage, setSourceImage] = useState<string | undefined>();
 

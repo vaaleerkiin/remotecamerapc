@@ -1,6 +1,7 @@
 "use client";
 import {
   Box,
+  Button,
   HStack,
   RadioProps,
   Text,
@@ -9,6 +10,7 @@ import {
 } from "@chakra-ui/react";
 import OBSWebSocket from "obs-websocket-js";
 import { useEffect, useState } from "react";
+import { ConfirmAction } from "./ConfirmAction";
 
 const RadioCard = (props: RadioProps) => {
   const { getInputProps, getRadioProps } = useRadio(props);
@@ -59,40 +61,35 @@ export const SceneChange = ({
   currnetScene: string;
   setCurrnetScene: (value: string) => void;
 }) => {
-  const { getRootProps, getRadioProps } = useRadioGroup({
-    name: "scenes",
-    value: currnetScene,
-    onChange: (nextValue) => {
-      obs
-        .call("SetCurrentProgramScene", { sceneName: nextValue })
-        .then(() =>
-          obs
-            .call("GetSceneList")
-            .then((res) => setCurrnetScene(res.currentProgramSceneName))
-        );
-    },
-  });
-
-  const group = getRootProps();
+  const ChangeScene = (SceneName: string) => {
+    obs
+      .call("SetCurrentProgramScene", { sceneName: SceneName })
+      .then(() =>
+        obs
+          .call("GetSceneList")
+          .then((res) => setCurrnetScene(res.currentProgramSceneName))
+      );
+  };
 
   return (
-    <HStack {...group} display="inline-flex" flexWrap="wrap" gap={2}>
+    <HStack display="inline-flex" flexWrap="wrap" gap={2}>
       {sceneList &&
         sceneList.map((value) => {
-          const radio = getRadioProps({ value });
           return (
-            <RadioCard key={value} {...radio}>
-              <Text
-                textAlign="center"
-                white-space="nowrap"
-                display="block"
-                noOfLines={2}
-                p="0 6px"
-                w="calc(100% + 8px)"
-              >
-                {value}
-              </Text>
-            </RadioCard>
+            <ConfirmAction key={value} onClick={() => ChangeScene(value)}>
+              <Button colorScheme={value === currnetScene ? "teal" : "gray"}>
+                <Text
+                  textAlign="center"
+                  white-space="nowrap"
+                  display="block"
+                  noOfLines={2}
+                  p="0 6px"
+                  w="calc(100% + 8px)"
+                >
+                  {value}
+                </Text>
+              </Button>
+            </ConfirmAction>
           );
         })}
     </HStack>

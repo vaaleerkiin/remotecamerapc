@@ -1,22 +1,18 @@
 "use client";
 
-import { Center, Heading, Img } from "@chakra-ui/react";
-import { redirect, useSearchParams } from "next/navigation";
+import { redirect } from "next/navigation";
 import OBSWebSocket from "obs-websocket-js";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Container } from "@chakra-ui/react";
 import { SceneChange } from "./SceneChange";
 import { ToogleStream } from "./ToogleStream";
-import { BackButton } from "../BackButton";
 import { Viewer } from "./Viewer";
 import { Stats } from "./Stats";
 
-export const ControlPanel = () => {
+export const ControlPanel = ({ ip }: { ip: string | null }) => {
   const [loading, setLoading] = useState(true);
-  const searchParams = useSearchParams();
-  const ip = searchParams.get("ip");
   const [obs, setObs] = useState<OBSWebSocket | undefined>();
-  const [streamStatus, setStreamStatus] = useState(false);
+  const [streamStatus, setStreamStatus] = useState<boolean | undefined>();
   const [sceneList, setSceneList] = useState<string[]>();
   const [currnetScene, setCurrnetScene] = useState<string>("");
 
@@ -59,37 +55,32 @@ export const ControlPanel = () => {
 
   return (
     <>
-      <BackButton />
-
       {!loading && obs && (
-        <>
-          <Heading textAlign="center">Control panel</Heading>
-          <Container
-            marginTop={4}
-            display="flex"
-            flexWrap="wrap"
-            gap={2}
-            justifyContent="center"
-          >
-            <Viewer
-              obs={obs}
-              currnetScene={currnetScene}
-              streamStatus={streamStatus}
-            />
-            <SceneChange
-              obs={obs}
-              sceneList={sceneList}
-              currnetScene={currnetScene}
-              setCurrnetScene={setCurrnetScene}
-            />
-            <ToogleStream
-              obs={obs}
-              streamStatus={streamStatus}
-              setStreamStatus={setStreamStatus}
-            />
-            <Stats obs={obs} />
-          </Container>
-        </>
+        <Container
+          marginTop={4}
+          display="flex"
+          flexWrap="wrap"
+          gap={2}
+          justifyContent="center"
+        >
+          <Viewer
+            obs={obs}
+            currnetScene={currnetScene}
+            streamStatus={streamStatus}
+          />
+          <SceneChange
+            obs={obs}
+            sceneList={sceneList}
+            currnetScene={currnetScene}
+            setCurrnetScene={setCurrnetScene}
+          />
+          <ToogleStream
+            obs={obs}
+            streamStatus={streamStatus}
+            setStreamStatus={setStreamStatus}
+          />
+          <Stats obs={obs} />
+        </Container>
       )}
     </>
   );

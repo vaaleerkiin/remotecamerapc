@@ -2,6 +2,7 @@ import { GetStreamStatus } from "@/util/OBS";
 import { Button } from "@chakra-ui/react";
 import OBSWebSocket from "obs-websocket-js";
 import { useEffect, useState } from "react";
+import { ConfirmAction } from "./ConfirmAction";
 
 export const ToogleStream = ({
   obs,
@@ -9,7 +10,7 @@ export const ToogleStream = ({
   setStreamStatus,
 }: {
   obs: OBSWebSocket;
-  streamStatus: boolean;
+  streamStatus: boolean | undefined;
   setStreamStatus: (status: boolean) => void;
 }) => {
   const ToogleStream = async () => {
@@ -19,13 +20,13 @@ export const ToogleStream = ({
 
   return (
     <>
-      <Button
-        h={50}
-        colorScheme={streamStatus ? "red" : "blue"}
-        onClick={ToogleStream}
-      >
-        {streamStatus ? "Stop stream" : "Start stream"}
-      </Button>
+      {streamStatus !== undefined && (
+        <ConfirmAction onClick={ToogleStream}>
+          <Button colorScheme={streamStatus ? "red" : "blue"}>
+            {streamStatus ? "Stop stream" : "Start stream"}
+          </Button>
+        </ConfirmAction>
+      )}
     </>
   );
 };
