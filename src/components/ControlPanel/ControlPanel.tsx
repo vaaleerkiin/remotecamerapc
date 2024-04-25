@@ -1,6 +1,6 @@
 "use client";
 
-import { Heading, Img } from "@chakra-ui/react";
+import { Center, Heading, Img } from "@chakra-ui/react";
 import { redirect, useSearchParams } from "next/navigation";
 import OBSWebSocket from "obs-websocket-js";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -9,6 +9,7 @@ import { SceneChange } from "./SceneChange";
 import { ToogleStream } from "./ToogleStream";
 import { BackButton } from "../BackButton";
 import { Viewer } from "./Viewer";
+import { Stats } from "./Stats";
 
 export const ControlPanel = () => {
   const [loading, setLoading] = useState(true);
@@ -70,7 +71,11 @@ export const ControlPanel = () => {
             gap={2}
             justifyContent="center"
           >
-            <Viewer obs={obs} currnetScene={currnetScene} />
+            <Viewer
+              obs={obs}
+              currnetScene={currnetScene}
+              streamStatus={streamStatus}
+            />
             <SceneChange
               obs={obs}
               sceneList={sceneList}
@@ -82,6 +87,7 @@ export const ControlPanel = () => {
               streamStatus={streamStatus}
               setStreamStatus={setStreamStatus}
             />
+            <Stats obs={obs} />
           </Container>
         </>
       )}
