@@ -17,8 +17,9 @@ npm i
 
 node server.js
 ```
-On the same computer, you need to enable the Web Sockets server and remove authorization
-All computers and servers must be on the same local network.
+On the same computer, you need to enable the Web Sockets server and remove authorization. 
+
+**All computers and servers must be on the same local network!!!**
 
 ### Currently available:
 
