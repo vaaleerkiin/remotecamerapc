@@ -18,6 +18,7 @@ export const Viewer = ({
 
     const interval = setInterval(
       async () => {
+        if (!obs && !sourceImage) return;
         const { imageData } = await obs.call("GetSourceScreenshot", {
           sourceName: currnetScene,
           imageFormat: "jpeg",
@@ -32,7 +33,7 @@ export const Viewer = ({
     return () => {
       clearInterval(interval);
     };
-  }, [currnetScene, obs, streamStatus]);
+  }, [currnetScene, obs, sourceImage, streamStatus]);
 
   return (
     <>
