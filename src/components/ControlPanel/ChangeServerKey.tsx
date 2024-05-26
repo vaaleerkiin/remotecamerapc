@@ -26,7 +26,6 @@ export const ChangeServerKey = ({
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setField(e.target.value);
-    console.log(e);
   }
 
   function handleSubmit() {
@@ -50,7 +49,7 @@ export const ChangeServerKey = ({
           autoComplete="off"
           onSubmit={(e) => e.preventDefault()}
         >
-          <FormLabel>Server url</FormLabel>
+          <FormLabel>Server key</FormLabel>
           <InputGroup size="md">
             <Input
               onChange={handleChange}

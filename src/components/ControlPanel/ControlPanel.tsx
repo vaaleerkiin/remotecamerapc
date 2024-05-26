@@ -3,13 +3,14 @@
 import { redirect } from "next/navigation";
 import OBSWebSocket, { OBSResponseTypes } from "obs-websocket-js";
 import { useEffect, useState } from "react";
-import { Container, Heading } from "@chakra-ui/react";
+import { Container, Heading, Tooltip } from "@chakra-ui/react";
 import { SceneChange } from "./SceneChange";
 import { ToogleStream } from "./ToogleStream";
 import { Viewer } from "./Viewer";
 import { Stats } from "./Stats";
 import { ChangeServerUrl } from "./ChangeServerUrl";
 import { ChangeServerKey } from "./ChangeServerKey";
+import { Modal } from "./Modal";
 
 export const ControlPanel = ({ ip }: { ip: string | null }) => {
   const [loading, setLoading] = useState(true);
@@ -22,12 +23,12 @@ export const ControlPanel = ({ ip }: { ip: string | null }) => {
   const [currnetScene, setCurrnetScene] = useState<string>("");
 
   useEffect(() => {
-    fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const fetchData = async () => {
     if (!ip) redirect("/search");
+    Handlers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ip]);
+
+  const Handlers = async () => {
     if (!loading) return;
 
     const obs = new OBSWebSocket();
@@ -37,38 +38,40 @@ export const ControlPanel = ({ ip }: { ip: string | null }) => {
       .catch(console.log)
       .then(() => setLoading(false));
 
-    const results = await obs
-      .callBatch([
-        {
-          requestType: "GetStreamStatus",
-        },
-        {
-          requestType: "GetSceneList",
-        },
-        {
-          requestType: "GetStreamServiceSettings",
-        },
-      ])
-      .then((res) => res);
+    const results = await obs.callBatch([
+      {
+        requestType: "GetStreamStatus",
+      },
+      {
+        requestType: "GetSceneList",
+      },
+      {
+        requestType: "GetStreamServiceSettings",
+      },
+    ]);
 
     const streamStatus = results[0]
       .responseData as OBSResponseTypes["GetStreamStatus"];
-
     setStreamStatus(streamStatus.outputActive);
 
     const sceneList = results[1]
       .responseData as OBSResponseTypes["GetSceneList"];
-
     setSceneList(
       sceneList.scenes.map((el) => el.sceneName).reverse() as string[]
     );
-
     setCurrnetScene(sceneList.currentProgramSceneName);
 
     const streamServiceSettings = results[2]
       .responseData as OBSResponseTypes["GetStreamServiceSettings"];
-
     setStatusStreamServiceSettings(streamServiceSettings);
+
+    obs.on("StreamStateChanged", (e) => {
+      setStreamStatus(e.outputActive);
+    });
+
+    obs.on("CurrentProgramSceneChanged", (e) => {
+      setCurrnetScene(e.sceneName);
+    });
 
     return () => {
       obs.disconnect();
@@ -86,14 +89,6 @@ export const ControlPanel = ({ ip }: { ip: string | null }) => {
           justifyContent="center"
         >
           <Heading size="md">{ip}</Heading>
-          <ChangeServerUrl
-            obs={obs}
-            streamServiceSettings={StreamServiceSettings}
-          />
-          <ChangeServerKey
-            obs={obs}
-            streamServiceSettings={StreamServiceSettings}
-          />
           <Viewer
             obs={obs}
             currnetScene={currnetScene}
@@ -103,13 +98,25 @@ export const ControlPanel = ({ ip }: { ip: string | null }) => {
             obs={obs}
             sceneList={sceneList}
             currnetScene={currnetScene}
-            setCurrnetScene={setCurrnetScene}
           />
-          <ToogleStream
-            obs={obs}
-            streamStatus={streamStatus}
-            setStreamStatus={setStreamStatus}
-          />
+          <ToogleStream obs={obs} streamStatus={streamStatus} />
+
+          <Modal
+            disabled={streamStatus || false}
+            header={<Heading size="md">{ip}</Heading>}
+            buttonText="Credentials"
+            tooltipLabel="Cannot be changed during broadcast"
+          >
+            <ChangeServerUrl
+              obs={obs}
+              streamServiceSettings={StreamServiceSettings}
+            />
+            <ChangeServerKey
+              obs={obs}
+              streamServiceSettings={StreamServiceSettings}
+            />
+          </Modal>
+
           <Stats obs={obs} />
         </Container>
       )}

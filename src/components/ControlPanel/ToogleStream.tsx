@@ -7,16 +7,11 @@ import { ConfirmAction } from "./ConfirmAction";
 export const ToogleStream = ({
   obs,
   streamStatus,
-  setStreamStatus,
 }: {
   obs: OBSWebSocket;
   streamStatus: boolean | undefined;
-  setStreamStatus: (status: boolean) => void;
 }) => {
-  const ToogleStream = async () => {
-    await obs.call("ToggleStream");
-    setStreamStatus(!streamStatus);
-  };
+  const ToogleStream = async () => await obs.call("ToggleStream");
 
   return (
     <>

@@ -6,10 +6,8 @@ import {
   RadioProps,
   Text,
   useRadio,
-  useRadioGroup,
 } from "@chakra-ui/react";
 import OBSWebSocket from "obs-websocket-js";
-import { useEffect, useState } from "react";
 import { ConfirmAction } from "./ConfirmAction";
 
 const RadioCard = (props: RadioProps) => {
@@ -54,22 +52,15 @@ export const SceneChange = ({
   obs,
   sceneList,
   currnetScene,
-  setCurrnetScene,
 }: {
   obs: OBSWebSocket;
   sceneList: string[] | undefined;
   currnetScene: string;
-  setCurrnetScene: (value: string) => void;
 }) => {
-  const ChangeScene = (SceneName: string) => {
+  const ChangeScene = (SceneName: string) =>
     obs
       .call("SetCurrentProgramScene", { sceneName: SceneName })
-      .then(() =>
-        obs
-          .call("GetSceneList")
-          .then((res) => setCurrnetScene(res.currentProgramSceneName))
-      );
-  };
+      .then(() => obs.call("GetSceneList"));
 
   return (
     <HStack display="inline-flex" flexWrap="wrap" gap={2}>

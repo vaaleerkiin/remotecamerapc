@@ -27,28 +27,28 @@ export const ConfirmAction = ({
       {({ onClose }) => (
         <>
           <PopoverTrigger>{children}</PopoverTrigger>
-          <Portal>
-            <PopoverContent w="160px">
-              <PopoverArrow />
-              <PopoverHeader>Confirm action?</PopoverHeader>
-              <PopoverCloseButton />
-              <PopoverBody
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
+          {/* <Portal> */}
+          <PopoverContent w="160px" zIndex={10000000000000}>
+            <PopoverArrow />
+            <PopoverHeader>Confirm action?</PopoverHeader>
+            <PopoverCloseButton />
+            <PopoverBody
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+            >
+              <Button
+                colorScheme="blue"
+                onClick={() => {
+                  onClose();
+                  onClick();
+                }}
               >
-                <Button
-                  colorScheme="blue"
-                  onClick={() => {
-                    onClose();
-                    onClick();
-                  }}
-                >
-                  Confirm
-                </Button>
-              </PopoverBody>
-            </PopoverContent>
-          </Portal>
+                Confirm
+              </Button>
+            </PopoverBody>
+          </PopoverContent>
+          {/* </Portal> */}
         </>
       )}
     </Popover>
